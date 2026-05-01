@@ -74,7 +74,7 @@ export async function createOrder(
   const pricing = getPricing(plan, cycle);
   if (!pricing) throw new Error("Invalid plan/cycle");
 
-  const order = await razorpay.orders.create({
+  const order = await getRazorpay().orders.create({
     amount: pricing.amount,
     currency: "INR",
     receipt: `ayurai_${userId}_${Date.now()}`,
