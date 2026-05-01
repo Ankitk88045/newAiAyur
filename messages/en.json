@@ -1,0 +1,71 @@
+{
+  "app": {
+    "name": "AyurAi",
+    "tagline": "Ancient Wisdom, Modern Intelligence"
+  },
+  "nav": {
+    "chat": "Chat with Vaidya",
+    "history": "History",
+    "pricing": "Pricing",
+    "settings": "Settings",
+    "admin": "Admin Panel",
+    "signOut": "Sign Out",
+    "signIn": "Sign In with Google"
+  },
+  "auth": {
+    "title": "Welcome to AyurAi",
+    "subtitle": "Your AI-powered Ayurveda companion",
+    "googleSignIn": "Continue with Google",
+    "terms": "By signing in, you agree to our Terms of Service",
+    "loading": "Signing in..."
+  },
+  "chat": {
+    "placeholder": "Ask about herbs, doshas, treatments, shlokas...",
+    "send": "Send",
+    "newChat": "New Chat",
+    "thinking": "Vaidya is contemplating...",
+    "disclaimer": "⚠️ This is for educational purposes only. Consult a qualified Ayurvedic physician for medical advice.",
+    "limitReached": "Daily query limit reached. Upgrade your plan for more.",
+    "exampleQueries": [
+      "What is Triphala and its benefits?",
+      "Explain Vata Dosha according to Charaka Samhita",
+      "Shloka for Ashwagandha from Ashtanga Hridayam",
+      "Ayurvedic treatment for insomnia"
+    ]
+  },
+  "shloka": {
+    "reference": "Reference",
+    "translation": "Translation",
+    "transliteration": "Transliteration",
+    "modernCorrelation": "Modern Correlation"
+  },
+  "plans": {
+    "free": "Free",
+    "lite": "Lite",
+    "pro": "Pro",
+    "upgrade": "Upgrade Plan",
+    "current": "Current Plan",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "queriesLeft": "{count} queries left today"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "subscriptions": "Subscriptions",
+    "aiKeys": "AI Keys",
+    "queryLogs": "Query Logs",
+    "adsense": "AdSense",
+    "totalUsers": "Total Users",
+    "activeSubscriptions": "Active Subscriptions",
+    "totalQueries": "Total Queries",
+    "revenue": "Monthly Revenue",
+    "aiCost": "AI Cost (Month)"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "rateLimited": "Too many requests. Please slow down.",
+    "unauthorized": "You are not authorized to access this page.",
+    "queryLimit": "You have reached your daily query limit."
+  }
+}

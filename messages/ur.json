@@ -1,0 +1,10 @@
+{
+  "app": { "name": "AyurAi", "tagline": "Ancient Wisdom, Modern Intelligence" },
+  "nav": { "chat": "Chat", "history": "History", "pricing": "Pricing", "settings": "Settings", "admin": "Admin", "signOut": "Sign Out", "signIn": "Sign In" },
+  "auth": { "title": "Welcome to AyurAi", "subtitle": "Your AI-powered Ayurveda companion", "googleSignIn": "Continue with Google", "terms": "By signing in, you agree to our Terms", "loading": "Signing in..." },
+  "chat": { "placeholder": "Ask about herbs, doshas, treatments...", "send": "Send", "newChat": "New Chat", "thinking": "Thinking...", "disclaimer": "⚠️ For educational purposes only.", "limitReached": "Daily limit reached. Upgrade your plan.", "exampleQueries": ["What is Triphala?", "Explain Vata Dosha", "Ashwagandha shloka", "Ayurvedic treatment for insomnia"] },
+  "shloka": { "reference": "Reference", "translation": "Translation", "transliteration": "Transliteration", "modernCorrelation": "Modern Correlation" },
+  "plans": { "free": "Free", "lite": "Lite", "pro": "Pro", "upgrade": "Upgrade", "current": "Current Plan", "perMonth": "/month", "perYear": "/year", "queriesLeft": "{count} queries left" },
+  "admin": { "dashboard": "Dashboard", "users": "Users", "subscriptions": "Subscriptions", "aiKeys": "AI Keys", "queryLogs": "Query Logs", "adsense": "AdSense", "totalUsers": "Total Users", "activeSubscriptions": "Active Subscriptions", "totalQueries": "Total Queries", "revenue": "Revenue", "aiCost": "AI Cost" },
+  "errors": { "generic": "Something went wrong.", "rateLimited": "Too many requests.", "unauthorized": "Unauthorized.", "queryLimit": "Daily query limit reached." }
+}

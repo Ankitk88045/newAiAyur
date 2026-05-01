@@ -1,0 +1,234 @@
+// prisma/schema.prisma
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+// ─── Enums ───────────────────────────────────────────────
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Plan {
+  FREE
+  LITE
+  PRO
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  HALFYEARLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+enum AIProvider {
+  GEMINI
+  OPENAI
+  DEEPSEEK
+  ANTHROPIC
+}
+
+enum QueryComplexity {
+  SIMPLE
+  MODERATE
+  COMPLEX
+}
+
+// ─── NextAuth Tables ──────────────────────────────────────
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core User ────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER)
+  language      String    @default("en")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  subscription  Subscription?
+  queries       QueryLog[]
+  chats         Chat[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ─── Subscription ─────────────────────────────────────────
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  plan            Plan               @default(FREE)
+  status          SubscriptionStatus @default(ACTIVE)
+  billingCycle    BillingCycle?
+  razorpayOrderId String?
+  razorpayPayId   String?
+  startsAt        DateTime           @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── Chat Sessions ────────────────────────────────────────
+model Chat {
+  id        String     @id @default(cuid())
+  userId    String
+  title     String     @default("New Chat")
+  language  String     @default("en")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  messages  Message[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  role      String   // "user" | "assistant"
+  content   String   @db.Text
+  metadata  Json?    // shloka, reference, etc.
+  createdAt DateTime @default(now())
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+}
+
+// ─── Query Logging + RAG ──────────────────────────────────
+model QueryLog {
+  id           String          @id @default(cuid())
+  userId       String
+  query        String          @db.Text
+  response     String          @db.Text
+  language     String          @default("en")
+  complexity   QueryComplexity @default(SIMPLE)
+  provider     AIProvider?
+  model        String?
+  tokensIn     Int             @default(0)
+  tokensOut    Int             @default(0)
+  costUsd      Float           @default(0)
+  latencyMs    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  embedding    KnowledgeChunk?
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([complexity])
+}
+
+// ─── RAG Knowledge Base ───────────────────────────────────
+model KnowledgeChunk {
+  id          String                      @id @default(cuid())
+  queryLogId  String?                     @unique
+  source      String                      // "user_query" | "samhita" | "manual"
+  title       String
+  content     String                      @db.Text
+  shloka      String?                     @db.Text
+  reference   String?
+  embedding   Unsupported("vector(1536)")?
+  createdAt   DateTime                    @default(now())
+  queryLog    QueryLog?                   @relation(fields: [queryLogId], references: [id])
+
+  @@index([source])
+}
+
+// ─── AI API Keys (Admin Managed) ─────────────────────────
+model AIKey {
+  id        String     @id @default(cuid())
+  provider  AIProvider
+  keyName   String
+  keyValue  String     @db.Text // encrypted
+  isActive  Boolean    @default(true)
+  usageCount Int       @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([provider, keyName])
+  @@index([provider, isActive])
+}
+
+// ─── AdSense Config (Admin Managed) ──────────────────────
+model AdConfig {
+  id        String  @id @default(cuid())
+  slot      String  @unique // "chat_banner", "sidebar", "chat_interstitial"
+  clientId  String
+  slotId    String
+  isActive  Boolean @default(true)
+  planShow  Plan[]  // which plans see this ad
+}
+
+// ─── Daily Usage Tracker ──────────────────────────────────
+model DailyUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  date      String   // "2024-01-15"
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
